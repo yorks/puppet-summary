@@ -11,5 +11,6 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.8
 	github.com/robfig/cron v1.2.0
 	github.com/skx/golang-metrics v0.0.0-20190325085214-453332cf54e8
+	github.com/skx/implant v0.0.0-20210220152501-e3add9a542a2 // indirect
 	github.com/smallfish/simpleyaml v0.1.0
 )

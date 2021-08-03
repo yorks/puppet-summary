@@ -31,6 +31,8 @@ github.com/skx/golang-metrics v0.0.0-20180606065905-85a4b4e0641f h1:hfW+6CozS1gF
 github.com/skx/golang-metrics v0.0.0-20180606065905-85a4b4e0641f/go.mod h1:ZX+VTMGkg8m8Da1GxWKj3bDaGIt08Qi6QSx8HlGxT6g=
 github.com/skx/golang-metrics v0.0.0-20190325085214-453332cf54e8 h1:NVwRIqHO7J7vnKGbTz5dBwWjl5Wr6mR1U8JQ32tw7vk=
 github.com/skx/golang-metrics v0.0.0-20190325085214-453332cf54e8/go.mod h1:P+OUoQPrBQUZg9lbHEu7iJsZYTC5Na4qghTSs5ZmTA4=
+github.com/skx/implant v0.0.0-20210220152501-e3add9a542a2 h1:IAP7owi6eYDlMZJjdoNnvw+Nnx5m69nhpEuh4DpESZ4=
+github.com/skx/implant v0.0.0-20210220152501-e3add9a542a2/go.mod h1:tw6hHhZHhmj9aM/mdWxv2xwsp17YCFXe8zCazlTH7zk=
 github.com/smallfish/simpleyaml v0.0.0-20170911015856-a32031077861 h1:9z0Ip656Pc+3cj/BpHkErOVg4iE0xcAdvJwfA3hMVzU=
 github.com/smallfish/simpleyaml v0.0.0-20170911015856-a32031077861/go.mod h1:eGZ1jp5PTJ+XVhTErUmw0xyPbgctPFlixWPypUrDkSs=
 github.com/smallfish/simpleyaml v0.1.0 h1:5uAZdLAiHxS9cmzkOxg7lH0dILXKTD7uRZbAhyHmyU0=
