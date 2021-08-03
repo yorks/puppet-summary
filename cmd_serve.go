@@ -160,6 +160,90 @@ func APIState(res http.ResponseWriter, req *http.Request) {
 
 }
 
+
+//
+// APIHistory is the handler for the HTTP end-point
+//
+//	 GET /api/history/$limit/
+//
+// This only will return plain-text by default, but JSON and XML are both
+// possible via the `Accept:` header or `?accept=XX` parameter.
+//
+func APIHistory(res http.ResponseWriter, req *http.Request) {
+
+	var (
+		status int
+		err    error
+	)
+	defer func() {
+		if nil != err {
+			http.Error(res, err.Error(), status)
+		}
+	}()
+
+	//
+	// Get the state the user is interested in.
+	//
+	vars := mux.Vars(req)
+	limit := vars["limit"]
+	environment := vars["environment"]
+
+	//
+	// Ensure we received a parameter.
+	//
+	if len(limit) < 1 {
+		status = http.StatusNotFound
+		err = errors.New("missing 'limit' parameter")
+		return
+	}
+	n, _ := strconv.Atoi(limit)
+	graphs, err := getHistory(environment, n)
+	if err != nil {
+		status = http.StatusInternalServerError
+		return
+	}
+
+	//
+	// Accept either a "?accept=XXX" URL-parameter, or
+	// the Accept HEADER in the HTTP request
+	//
+	accept := req.FormValue("accept")
+	if len(accept) < 1 {
+		accept = req.Header.Get("Accept")
+	}
+
+	switch accept {
+	case "text/plain":
+		res.Header().Set("Content-Type", "text/plain")
+
+		for _, g := range graphs {
+			fmt.Fprintf(res, "%s\n", g)
+		}
+	case "application/xml":
+		x, err := xml.MarshalIndent(graphs, "", "  ")
+		if err != nil {
+			status = http.StatusInternalServerError
+			return
+		}
+
+		res.Header().Set("Content-Type", "application/xml")
+		res.Write(x)
+	default:
+
+		//
+		// Convert the string-array to JSON, and return it.
+		//
+		res.Header().Set("Content-Type", "application/json")
+
+			out, _ := json.Marshal(graphs)
+			fmt.Fprintf(res, "%s", out)
+
+	}
+
+}
+
+
+
 //
 // RadiatorView is the handler for the HTTP end-point
 //
@@ -895,7 +979,7 @@ func IndexHandler(res http.ResponseWriter, req *http.Request) {
 	// with both the nodes in the list, and the graph-data
 	//
 	type Pagedata struct {
-		Graph        []PuppetHistory
+		//Graph        []PuppetHistory
 		Nodes        []PuppetRuns
 		Environment  string
 		Environments []string
@@ -913,12 +997,14 @@ func IndexHandler(res http.ResponseWriter, req *http.Request) {
 
 	//
 	// Get the graph-data
-	//
-	graphs, err := getHistory(environment)
+	// 
+	/*  move APIHistory for ajax request.
+	graphs, err := getHistory(environment, 60)
 	if err != nil {
 		status = http.StatusInternalServerError
 		return
 	}
+	*/
 
 	//
 	// Get all environments
@@ -928,7 +1014,7 @@ func IndexHandler(res http.ResponseWriter, req *http.Request) {
 	// Populate this structure.
 	//
 	var x Pagedata
-	x.Graph = graphs
+	//x.Graph = graphs
 	x.Nodes = NodeList
 	x.Environment = environment
 	x.Environments = environments
@@ -1027,6 +1113,8 @@ func serve(settings serveCmd) {
 	//
 	router.HandleFunc("/api/state/{state}/", APIState).Methods("GET")
 	router.HandleFunc("/api/state/{state}", APIState).Methods("GET")
+	router.HandleFunc("/api/history/{limit}/", APIHistory).Methods("GET")
+	router.HandleFunc("/api/history/{environment}/{limit}/", APIHistory).Methods("GET")
 
 	//
 	//

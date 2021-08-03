@@ -12,69 +12,7 @@
     <script src="{{.Urlprefix }}/js/Chart.bundle.min.js"></script>
     <script src="{{.Urlprefix }}/js/jquery.dataTables.min.js"></script>
     <script src="{{.Urlprefix }}/js/dataTables.bootstrap.min.js"></script>
-    <script type="text/javascript">
-     window.onload = function () {
-       var barChartData = {
-         labels: [
-           {{range .Graph }}
-           "{{.Date }}",
-           {{end}}
-         ],
-         datasets: [{
-           label: 'Changed',
-           backgroundColor: '#d9edf7',
-           data: [
-             {{range .Graph }}
-             "{{.Changed }}",
-             {{end}}
-           ]
-         }, {
-           label: 'Unchanged',
-           backgroundColor: '#e7e7e7',
-           data: [
-             {{range .Graph }}
-             "{{.Unchanged }}",
-             {{end}}
-           ]
-         }, {
-           label: 'Failed',
-           backgroundColor: '#f2dede',
-           data: [
-             {{range .Graph }}
-             "{{.Failed }}",
-             {{end}}
-           ]
-         }]
-
-       };
-       var ctx = document.getElementById("canvas").getContext("2d");
-       window.myBar = new Chart(ctx, {
-         type: 'bar',
-         data: barChartData,
-         options: {
-           title:{
-             display:false,
-             text:"Chart.js Bar Chart - Stacked"
-           },
-           tooltips: {
-             mode: 'index',
-             intersect: false
-           },
-           responsive: true,
-           scales: {
-             xAxes: [{
-               stacked: true,
-             }],
-             yAxes: [{
-               stacked: true
-             }]
-           }
-         }
-       });
-
-     };
-
-    </script>
+    <script src="{{.Urlprefix }}/js/history-chart.js"></script>
   </head>
   <body>
     <nav class="navbar navbar-default">
@@ -120,7 +58,7 @@
     <div class="container">
 
       <h1>Node Summary{{if ne .Environment "" }} for environment: {{.Environment}}{{ end }}</h1>
-      <canvas id="canvas" style="height: 150px; width: 90%; margin-left:5%; margin-right:5%"></canvas>
+      <canvas id="canvas" style="height: 150px; width: 90%; margin-left:5%; margin-right:5%" data-url="{{$.Urlprefix}}/api/history/30/"></canvas>
       <div id="fcanvas" ></div>
       <p>&nbsp;</p>
 
@@ -348,6 +286,31 @@
        if ( changed > 0 ) { $('#changed_count').html( changed ) }
        if ( failed > 0 ) { $('#failed_count').html( failed )  }
        if ( orphaned > 0 ) { $('#orphaned_count').html( orphaned )  }
+
+
+       var ctx = document.getElementById("canvas").getContext("2d");
+       var url = $("#canvas").data("url")
+       var myBar = new Chart(ctx, {
+         type: 'bar',
+         data: {labels:[], datasets: [{
+           label: 'Changed',
+           backgroundColor: '#d9edf7',
+           data: [],
+	 }]},
+         options: {
+           title:{display:false,text:"Chart.js Bar Chart - Stacked"},
+           tooltips: {mode: 'index',intersect: false},
+           responsive: true,
+           scales: {
+             xAxes: [{stacked: true,}],
+             yAxes: [{stacked: true}]
+           }
+         }
+       });
+
+       ajax_chart(myBar, url)
+
+
 
 	});
     </script>
