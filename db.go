@@ -676,6 +676,7 @@ func getHistory(environment string) ([]PuppetHistory, error) {
 	if len(environment) > 0 {
 		sel = sel + " WHERE environment = '" + environment + "'"
 	}
+	sel = sel + " ORDER BY executed_at DESC"
 	//
 	// Get all the distinct dates we have data for.
 	//
@@ -712,7 +713,7 @@ func getHistory(environment string) ([]PuppetHistory, error) {
 	// Now we have all the unique dates in `dates`.
 	//
 	loc, _ := time.LoadLocation("Local")
-	for _, known := range dates {
+	for _, known := range dates[:60] { // but we only get the first 60 days PuppetHistory.
 
 		//
 		// The result for this date.
