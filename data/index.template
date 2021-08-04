@@ -93,7 +93,7 @@
               <td>{{.Fqdn}}</td>
               <td>{{.Environment}}</td>
               <td>{{.State}}</td>
-              <td data-text="{{.Epoch}}" data-sort-value="{{.Epoch}}" title="{{.At}}">{{.Ago}}</td>
+              <td data-text="{{.Epoch}}" data-order="{{.Epoch}}" title="{{.At}}">{{.Ago}}</td>
             </tr>
             {{end}}
 	    </tbody>
@@ -118,7 +118,7 @@
               <td>{{.Fqdn}}</td>
               <td>{{.Environment}}</td>
               <td>{{.State}}</td>
-              <td data-text="{{.Epoch}}" data-sort-value="{{.Epoch}}" title="{{.At}}">{{.Ago}}</td>
+              <td data-text="{{.Epoch}}" data-order="{{.Epoch}}" title="{{.At}}">{{.Ago}}</td>
             </tr>
             {{end}}
             {{end}}
@@ -144,7 +144,7 @@
               <td>{{.Fqdn}}</td>
               <td>{{.Environment}}</td>
               <td>{{.State}}</td>
-              <td data-text="{{.Epoch}}" data-sort-value="{{.Epoch}}" title="{{.At}}">{{.Ago}}</td>
+              <td data-text="{{.Epoch}}" data-order="{{.Epoch}}" title="{{.At}}">{{.Ago}}</td>
             </tr>
             {{end}}
             {{end}}
@@ -170,7 +170,7 @@
               <td>{{.Fqdn}}</td>
               <td>{{.Environment}}</td>
               <td>{{.State}}</td>
-              <td data-text="{{.Epoch}}" data-sort-value="{{.Epoch}}" title="{{.At}}">{{.Ago}}</td>
+              <td data-text="{{.Epoch}}" data-order="{{.Epoch}}" title="{{.At}}">{{.Ago}}</td>
             </tr>
             {{end}}
             {{end}}
@@ -196,7 +196,7 @@
               <td>{{.Fqdn}}</td>
               <td>{{.Environment}}</td>
               <td>{{.State}}</td>
-              <td data-text="{{.Epoch}}" data-sort-value="{{.Epoch}}" title="{{.At}}">{{.Ago}}</td>
+              <td data-text="{{.Epoch}}" data-order="{{.Epoch}}" title="{{.At}}">{{.Ago}}</td>
             </tr>
             {{end}}
             {{end}}
