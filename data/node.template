@@ -6,10 +6,12 @@
     <link href="{{.Urlprefix }}/favicon.ico" rel="shortcut icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{.Urlprefix }}/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{.Urlprefix }}/css/dataTables.bootstrap.min.css" rel="stylesheet">
     <script src="{{.Urlprefix }}/js/jquery-1.12.4.min.js"></script>
     <script src="{{.Urlprefix }}/js/bootstrap.min.js"></script>
     <script src="{{.Urlprefix }}/js/Chart.bundle.min.js"></script>
-    <script src="{{.Urlprefix }}/js/jquery.tablesorter.min.js"></script>
+    <script src="{{.Urlprefix }}/js/jquery.dataTables.min.js"></script>
+    <script src="{{.Urlprefix }}/js/dataTables.bootstrap.min.js"></script>
     <script type="text/javascript">
 
      window.onload = function () {
@@ -18,17 +20,24 @@
 	 {{.Runtime}} ,
          {{end}}
        ];
+       var seens = [
+         {{range .Nodes }}
+	 "{{.At}}",
+         {{end}}
+       ];
        var labels = [];
        for (var i =0; i < points.length; i++ ) {
-         labels.push( i+1 );
+	 var j = i+1;
+	 var l = j + " " +seens[i];
+         labels.push( l );
        }
        var config = {
          type: 'line',
          data: {
-           labels: labels,
+           labels: labels.reverse(),
            datasets: [{
              label: "seconds",
-             data: points,
+             data: points.reverse(),
              fill: false,
            }]
          },
@@ -101,7 +110,8 @@
       <h1>{{.Fqdn}}</h1>
       <canvas id="canvas" style="height: 200px; width: 90%; margin-left:5%; margin-right:5%"></canvas>
       <p>&nbsp;</p>
-      <table class="table table-bordered table-striped table-condensed table-hover">
+      <table id="node-reports_table" class="table table-bordered table-striped table-condensed table-hover">
+       <thead>
         <tr>
           <th>ID</th>
           <th>Node</th>
@@ -112,6 +122,8 @@
           <th>Changed</th>
           <th>Total</th>
         </tr>
+       </thead>
+       <tbody>
         {{range $i, $e := .Nodes}}
         <tr
             {{if eq .State "failed" }} class="danger" {{ end }}
@@ -121,12 +133,13 @@
           <td>{{.Fqdn}}</td>
           <td>{{.Environment}}</td>
           <td>{{.State}}</td>
-          <td title="{{.At}}">{{.Ago}}</td>
+          <td data-order="{{.At}}" title="{{.At}}">{{.Ago}}</td>
           <td>{{.Failed}}</td>
           <td>{{.Changed}}</td>
           <td>{{.Total}}</td>
         </tr>
         {{end}}
+      </tbody>
       </table>
     </div>
     <p>&nbsp;</p>
@@ -221,6 +234,13 @@
          };
 
        });
+
+     $(document).ready( function () {
+		var dt = $('#node-reports_table').DataTable();
+       });
+
+
+
       </script>
   </body>
 </html>
