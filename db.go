@@ -998,7 +998,7 @@ func pruneUnchanged(environment string, prefix string, verbose bool) error {
 	//
 	// Find unchanged reports.
 	//
-	find, err := db.Prepare("SELECT id,yaml_file FROM reports WHERE state='unchanged'" + envCondition)
+	find, err := db.Prepare("SELECT id,yaml_file FROM reports WHERE state='unchanged' AND yaml_file!='pruned'" + envCondition)
 	if err != nil {
 		return err
 	}
