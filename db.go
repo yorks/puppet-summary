@@ -895,7 +895,7 @@ func pruneReports(environment string, prefix string, ago uint64, verbose bool) e
 	//
 	// Convert our query into something useful.
 	//
-	oldts := time.Now().Unix() - ago
+	oldts := uint64(time.Now().Unix()) - ago
 
 	//
 	// Find things that are old.
@@ -988,7 +988,7 @@ func pruneUnchanged(environment string, prefix string, ago uint64, verbose bool)
 		return errors.New("SetupDB not called")
 	}
 
-	oldts := time.Now().Unix() - ago
+	oldts := uint64(time.Now().Unix()) - ago
 	//
 	// Select appropriate environment, if specified
 	//
