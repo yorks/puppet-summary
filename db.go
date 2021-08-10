@@ -875,7 +875,7 @@ func pruneDangling(prefix string, noop bool, verbose bool) error {
 // copy of the on-disk YAML, but once we've done that we can delete them
 // as a group.
 //
-func pruneReports(environment string, prefix string, days int, verbose bool) error {
+func pruneReports(environment string, prefix string, ago uint64, verbose bool) error {
 
 	//
 	// Ensure we have a DB-handle
@@ -895,12 +895,12 @@ func pruneReports(environment string, prefix string, days int, verbose bool) err
 	//
 	// Convert our query into something useful.
 	//
-	time := days * (24 * 60 * 60)
+	oldts := time.Now().Unix() - ago
 
 	//
 	// Find things that are old.
 	//
-	find, err := db.Prepare("SELECT id,yaml_file FROM reports WHERE ( ( strftime('%s','now') - executed_at ) > ? )" + envCondition)
+	find, err := db.Prepare("SELECT id,yaml_file FROM reports WHERE executed_at < ? " + envCondition)
 	if err != nil {
 		return err
 	}
@@ -908,7 +908,7 @@ func pruneReports(environment string, prefix string, days int, verbose bool) err
 	//
 	// Remove old reports, en mass.
 	//
-	clean, err := db.Prepare("DELETE FROM reports WHERE ( ( strftime('%s','now') - executed_at ) > ? )" + envCondition)
+	clean, err := db.Prepare("DELETE FROM reports WHERE executed_at < ? " + envCondition)
 	if err != nil {
 		return err
 	}
@@ -916,7 +916,7 @@ func pruneReports(environment string, prefix string, days int, verbose bool) err
 	//
 	// Find the old reports.
 	//
-	rows, err := find.Query(time)
+	rows, err := find.Query(oldts)
 	if err != nil {
 		return err
 	}
@@ -963,7 +963,7 @@ func pruneReports(environment string, prefix string, days int, verbose bool) err
 	//
 	//  Now cleanup the old records
 	//
-	_, err = clean.Exec(time)
+	_, err = clean.Exec(oldts)
 	if err != nil {
 		return err
 	}
@@ -972,13 +972,14 @@ func pruneReports(environment string, prefix string, days int, verbose bool) err
 }
 
 //
-// Prune reports from nodes which are unchanged.
+// Prune reports(yaml) from nodes which are unchanged limit by older ago seconds.
+//   WARNNING: if ago is zero(0), it will prune all the unchanged yaml files.
 //
 // We have to find the old reports, individually, so we can unlink the
 // copy of the on-disk YAML, but once we've done that we can delete them
 // as a group.
 //
-func pruneUnchanged(environment string, prefix string, verbose bool) error {
+func pruneUnchanged(environment string, prefix string, ago uint64, verbose bool) error {
 
 	//
 	// Ensure we have a DB-handle
@@ -987,6 +988,7 @@ func pruneUnchanged(environment string, prefix string, verbose bool) error {
 		return errors.New("SetupDB not called")
 	}
 
+	oldts := time.Now().Unix() - ago
 	//
 	// Select appropriate environment, if specified
 	//
@@ -998,7 +1000,7 @@ func pruneUnchanged(environment string, prefix string, verbose bool) error {
 	//
 	// Find unchanged reports.
 	//
-	find, err := db.Prepare("SELECT id,yaml_file FROM reports WHERE state='unchanged' AND yaml_file!='pruned'" + envCondition)
+	find, err := db.Prepare("SELECT id,yaml_file FROM reports WHERE state='unchanged' AND yaml_file!='pruned' AND executed_at < ? " + envCondition)
 	if err != nil {
 		return err
 	}
@@ -1006,7 +1008,7 @@ func pruneUnchanged(environment string, prefix string, verbose bool) error {
 	//
 	// Prepare to update them all.
 	//
-	clean, err := db.Prepare("UPDATE reports SET yaml_file='pruned' WHERE state='unchanged'" + envCondition)
+	clean, err := db.Prepare("UPDATE reports SET yaml_file='pruned' WHERE state='unchanged' AND yaml_file!='pruned' AND executed_at < ? " + envCondition)
 	if err != nil {
 		return err
 	}
@@ -1014,7 +1016,7 @@ func pruneUnchanged(environment string, prefix string, verbose bool) error {
 	//
 	// Find the reports.
 	//
-	rows, err := find.Query()
+	rows, err := find.Query(oldts)
 	if err != nil {
 		return err
 	}
@@ -1061,7 +1063,7 @@ func pruneUnchanged(environment string, prefix string, verbose bool) error {
 	//
 	//  Now cleanup the old records
 	//
-	_, err = clean.Exec()
+	_, err = clean.Exec(oldts)
 	if err != nil {
 		return err
 	}

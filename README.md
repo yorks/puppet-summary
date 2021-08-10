@@ -141,6 +141,14 @@ Over time your reports will start to consuming ever-increasing amounts of disk-s
 
 That will remove the saved YAML files from disk which are over 7 days old, and it will _also_ remove the associated database entries that refer to them.
 
+If you're need the database record but only remove the saved YAML files which unchanged:
+
+    puppet-summary prune -unchanged -days 7 -prefix ./reports/
+
+Note that, -days 7 will remove the unchanged saved YAML files which are over 7 days old.
+If days is zero(0), will remove all the unchanged saved YAML files.
+If days is negative(<0), will remove the unchanged saved YAML files which are over xx hours old.
+
 If you're happy with the default pruning behaviour, which is particularly useful when you're running this software in a container, described in [HACKING.md](HACKING.md), you can prune old reports automatically once per week without the need to add a cron-job like so:
 
     puppet-summary serve  -auto-prune [options..]

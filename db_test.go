@@ -310,7 +310,7 @@ func TestPruneUnchanged(t *testing.T) {
 	//
 	// Run the prune
 	//
-	pruneUnchanged("", "", false)
+	pruneUnchanged("", "", 3600, false)
 
 	//
 	// Count them again

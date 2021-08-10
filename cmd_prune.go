@@ -27,10 +27,22 @@ type pruneCmd struct {
 	verbose     bool
 }
 
+func daysToSeconds(days int) uint64 {
+	switch {
+	case days == 0:
+		return uint64(0)
+	case days < 0:
+		return uint64(-3600*24*days)
+	default:
+		return uint64(3600*24*days)
+	}
+}
+
 //
 // Run a prune
 //
 func runPrune(x pruneCmd) error {
+	ago := daysToSeconds(x.days)
 
 	//
 	// Remove yaml files that are not referenced in the database
@@ -57,9 +69,9 @@ func runPrune(x pruneCmd) error {
 	//
 	if x.unchanged {
 		if x.verbose {
-			fmt.Printf("Pruning 'unchanged' reports from beneath %s\n", ReportPrefix)
+			fmt.Printf("Pruning 'unchanged' reports older than %d days: %d seconds ago from beneath %s\n", x.days, ago, ReportPrefix)
 		}
-		return (pruneUnchanged(x.environment, x.prefix, x.verbose))
+		return (pruneUnchanged(x.environment, x.prefix, ago, x.verbose))
 	}
 
 	//
@@ -67,10 +79,10 @@ func runPrune(x pruneCmd) error {
 	// number of days.
 	//
 	if x.verbose {
-		fmt.Printf("Pruning reports older than %d days from beneath %s\n", x.days, ReportPrefix)
+		fmt.Printf("Pruning reports older than %d days: %d seconds ago from beneath %s\n", x.days, ago, ReportPrefix)
 	}
 
-	err := pruneReports(x.environment, x.prefix, x.days, x.verbose)
+	err := pruneReports(x.environment, x.prefix, ago, x.verbose)
 	return err
 }
 
@@ -90,8 +102,8 @@ func (*pruneCmd) Usage() string {
 //
 func (p *pruneCmd) SetFlags(f *flag.FlagSet) {
 	f.BoolVar(&p.verbose, "verbose", false, "Be verbose in reporting output")
-	f.IntVar(&p.days, "days", 7, "Remove reports older than this many days.")
-	f.BoolVar(&p.unchanged, "unchanged", false, "Remove reports from hosts which had no changes.")
+	f.IntVar(&p.days, "days", 7, "Remove reports older than this many days. if is 0 means now, if is negative(<0) means how many hours ago.")
+	f.BoolVar(&p.unchanged, "unchanged", false, "Remove reports(yaml) from hosts which had no changes.")
 	f.BoolVar(&p.orphaned, "orphaned", false, "Remove reports from hosts which are orphaned.")
 	f.StringVar(&p.dbFile, "db-file", "ps.db", "The SQLite database to use.")
 	f.StringVar(&p.prefix, "prefix", "./reports/", "The prefix to the local YAML hierarchy.")
