@@ -224,11 +224,23 @@ func addDB(data PuppetReport, path string) error {
 	}
 	defer stmt.Close()
 
+	t, err := time.Parse(time.RFC3339Nano, data.At)
+	executed_at := time.Now().Unix()
+	if err != nil {
+		fmt.Printf("Error cannot convert %s to time struct by time.RFC3339Nano, e:%v\n", data.At, err)
+		fmt.Println("Fallback to time.now")
+
+	}else{
+		executed_at = t.Unix()
+	}
+
+
+
 	stmt.Exec(data.Fqdn,
 		data.Environment,
 		data.State,
 		path,
-		time.Now().Unix(),
+		executed_at,
 		data.Runtime,
 		data.Failed,
 		data.Changed,

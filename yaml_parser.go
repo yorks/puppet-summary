@@ -177,12 +177,14 @@ func parseTime(y *simpleyaml.Yaml, out *PuppetReport) error {
 	// Strip any quotes that might surround the time.
 	at = strings.Replace(at, "'", "", -1)
 
+	/* we need the timezone info
 	// Convert "T" -> " "
 	at = strings.Replace(at, "T", " ", -1)
 
 	// strip the time at the first period.
 	parts := strings.Split(at, ".")
 	at = parts[0]
+	*/
 
 	// update the struct
 	out.At = at

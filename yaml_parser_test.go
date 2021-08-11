@@ -51,7 +51,7 @@ func TestYamlDates(t *testing.T) {
 		//
 		node, _ := ParsePuppetReport([]byte(input))
 
-		if node.At != "2017-03-10 10:22:33" {
+		if node.At != "2017-03-10T10:22:33.659245699+00:00" {
 			t.Errorf("Invalid time result, got '%s'", node.At)
 		}
 	}
@@ -226,7 +226,7 @@ func TestValidYaml(t *testing.T) {
 	if report.State != "unchanged" {
 		t.Errorf("Incorrect state: %v", report.State)
 	}
-	if report.At != "2017-07-29 23:17:01" {
+	if report.At != "2017-07-29 23:17:01.493526494 +00:00" {
 		t.Errorf("Incorrect at: %v", report.At)
 	}
 	if report.Failed != "0" {
