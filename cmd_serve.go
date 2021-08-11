@@ -1168,7 +1168,15 @@ func serve(settings serveCmd) {
 	//
 	// Wire up logging.
 	//
-	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
+	logFile := os.Stdout
+	if(len(settings.accessLog)!=0){
+		f, err := os.OpenFile(settings.accessLog, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
+		if err != nil {
+			panic(err)
+		}
+		logFile = f
+	}
+	loggedRouter := handlers.LoggingHandler(logFile, router)
 
 	//
 	// We want to make sure we handle timeouts effectively by using
@@ -1200,6 +1208,7 @@ type serveCmd struct {
 	dbFile    string
 	prefix    string
 	urlprefix string
+	accessLog string
 }
 
 type templateOptions struct {
@@ -1229,6 +1238,7 @@ func (p *serveCmd) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&p.dbFile, "db-file", "ps.db", "The SQLite database to use.")
 	f.StringVar(&p.prefix, "prefix", "./reports/", "The prefix to the local YAML hierarchy.")
 	f.StringVar(&p.urlprefix, "urlprefix", "", "The URL prefix for serving behind a proxy.")
+	f.StringVar(&p.accessLog, "accesslog", "", "The file path for recording access log.")
 }
 
 //
