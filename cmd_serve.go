@@ -1268,12 +1268,18 @@ func (p *serveCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{})
 		c := cron.New()
 
 		//
-		//  Every seven days prune the reports.
+		//  Every month prune the unchanged reports.
 		//
-		c.AddFunc("@weekly", func() {
-			fmt.Printf("Automatically pruning old reports")
-			pruneReports("", p.prefix, 7*24*3600, "unchanged", false)
+		c.AddFunc("@monthly", func() {
+			fmt.Println("Automatically pruning old unchanged reports(db+yaml) monthly.")
+			pruneReports("", p.prefix, 30*24*3600, "unchanged", false)
 		})
+                c.AddFunc("@hourly", func() {
+                        fmt.Println("Automatically pruning 2 hours ago unchanged reports(yaml) hourly.")
+                        pruneUnchanged("", p.prefix, 3600*2, false)
+                })
+
+
 
 		//
 		// Launch the cron-scheduler.
