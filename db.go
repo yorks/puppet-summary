@@ -890,7 +890,7 @@ func pruneDangling(prefix string, noop bool, verbose bool) error {
 // copy of the on-disk YAML, but once we've done that we can delete them
 // as a group.
 //
-func pruneReports(environment string, prefix string, ago uint64, verbose bool) error {
+func pruneReports(environment string, prefix string, ago uint64, state string, verbose bool) error {
 
 	//
 	// Ensure we have a DB-handle
@@ -908,6 +908,14 @@ func pruneReports(environment string, prefix string, ago uint64, verbose bool) e
 	}
 
 	//
+	// Select appropriate state, if specified
+	//
+	stateCondition := ""
+	if len(state) > 0 {
+		stateCondition = " AND state = '" + state + "'"
+	}
+
+	//
 	// Convert our query into something useful.
 	//
 	oldts := uint64(time.Now().Unix()) - ago
@@ -915,7 +923,7 @@ func pruneReports(environment string, prefix string, ago uint64, verbose bool) e
 	//
 	// Find things that are old.
 	//
-	find, err := db.Prepare("SELECT id,yaml_file FROM reports WHERE executed_at < ? " + envCondition)
+	find, err := db.Prepare("SELECT id,yaml_file FROM reports WHERE executed_at < ? " + envCondition + stateCondition)
 	if err != nil {
 		return err
 	}
@@ -923,7 +931,7 @@ func pruneReports(environment string, prefix string, ago uint64, verbose bool) e
 	//
 	// Remove old reports, en mass.
 	//
-	clean, err := db.Prepare("DELETE FROM reports WHERE executed_at < ? " + envCondition)
+	clean, err := db.Prepare("DELETE FROM reports WHERE executed_at < ? " + envCondition + stateCondition)
 	if err != nil {
 		return err
 	}

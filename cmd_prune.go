@@ -19,6 +19,7 @@ type pruneCmd struct {
 	dbFile      string
 	days        int
 	environment string
+	state       string
 	unchanged   bool
 	orphaned    bool
 	prefix      string
@@ -82,7 +83,7 @@ func runPrune(x pruneCmd) error {
 		fmt.Printf("Pruning reports older than %d days: %d seconds ago from beneath %s\n", x.days, ago, ReportPrefix)
 	}
 
-	err := pruneReports(x.environment, x.prefix, ago, x.verbose)
+	err := pruneReports(x.environment, x.prefix, ago, x.state, x.verbose)
 	return err
 }
 
@@ -107,6 +108,7 @@ func (p *pruneCmd) SetFlags(f *flag.FlagSet) {
 	f.BoolVar(&p.orphaned, "orphaned", false, "Remove reports from hosts which are orphaned.")
 	f.StringVar(&p.dbFile, "db-file", "ps.db", "The SQLite database to use.")
 	f.StringVar(&p.prefix, "prefix", "./reports/", "The prefix to the local YAML hierarchy.")
+	f.StringVar(&p.state, "state", "", "Remove reports(db+yaml) from hosts which state(unchanged|changed|failed) is. if not specify means ignore which state is.")
 	f.BoolVar(&p.dangling, "dangling", false, "Remove yaml reports that are not referenced in the database.")
 	f.BoolVar(&p.noop, "noop", false, "Do not remove dangling yaml files, just pretend.")
 	f.StringVar(&p.environment, "environment", "", "If specified only prune this environment.")

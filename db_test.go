@@ -188,7 +188,7 @@ func TestMissingInit(t *testing.T) {
 		t.Errorf("Got wrong error: %v", err)
 	}
 
-	err = pruneReports("", "", 3, false)
+	err = pruneReports("", "", 3, "", false)
 	if !reg.MatchString(err.Error()) {
 		t.Errorf("Got wrong error: %v", err)
 	}
@@ -244,7 +244,7 @@ func TestPrune(t *testing.T) {
 	//
 	// Run the prune
 	//
-	pruneReports("", "", 5, false)
+	pruneReports("", "", 5, "",false)
 
 	//
 	// Count them again
