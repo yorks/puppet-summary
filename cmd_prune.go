@@ -32,7 +32,7 @@ func daysToSeconds(days int) uint64 {
 	case days == 0:
 		return uint64(0)
 	case days < 0:
-		return uint64(-3600*24*days)
+		return uint64(-3600*days)
 	default:
 		return uint64(3600*24*days)
 	}
